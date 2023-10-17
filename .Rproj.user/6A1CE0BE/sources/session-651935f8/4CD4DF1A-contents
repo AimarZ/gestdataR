@@ -1,0 +1,1624 @@
+---
+title: 'Documentación del paquete: **gestdata**'
+author: "Aimar Zabala Vergara"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Viñeta del paquete: **gestdata**}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+# output:
+#   html_document:
+#     df_print: paged
+# vignette: "%\\VignetteIndexEntry{Documentación del paquete: **gestdata**} %\\VignetteEngine{knitr::rmarkdown}
+#   %\\VignetteEncoding{UTF-8}\n"
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+::: {.cell .markdown}
+En este documento se presentan las funcionalidades que ofrece el paquete
+**gestdata**. Aparte de contener explicaciones de cada función y clase
+que se implementa en la librería, contiene bloques de código que ayudan
+a entender el correcto uso del paquete **gestdata**.
+:::
+
+::: {.cell .markdown}
+### Importación de los paquetes necesarios
+:::
+
+::: {.cell .markdown}
+En este documento se presentan las funcionalidades que ofrece el paquete **gestdata**. Aparte de contener explicaciones de cada función y clase que se implementa en la librería, contiene bloques de código que ayudan a entender el correcto uso del paquete **gestdata**.
+
+Primero de todo, importamos la librería gestdata:
+:::
+
+::: {.cell .code}
+
+```{r importar-libreria}
+library(gestdata)
+```
+:::
+
+::: {.cell .markdown}
+### Inicialización de los datos
+:::
+
+::: {.cell .markdown}
+A lo largo de este documento se mostrarán ejecuciones de distintas
+funciones del paquete **gestdata**. Por tanto, se requieren datos sobre
+los cuales hacer las ejecuciones. En esta sección se inicializan varios
+tipos de estructuras de datos que se emplearán a lo largo del documento.
+:::
+
+::: {.cell .code}
+```{r inicializacion-datos}
+# Inicialización de un vector de números reales
+a <- c(3.5,7.4,1.2,2.0,3.9,5.3,6.1,6.9)
+
+# Inicialización de una matriz de enteros
+m <- matrix(c(1,2,3,4,5,11,13,19), nrow=4, ncol=2)
+
+# Inicialización de un data.frame y sus variables
+Name = c("Jon", "Bill", "Maria", "Ben", "Tina")
+Age = c(23, 41, 32, 58, 26)
+Weight = c(61,98,75,112,74)
+Height = c(1.75,1.68,1.56,1.86,1.76)
+Hair = c("Long", "Short","Long", "Short","Long")
+Independent = c(TRUE, FALSE, TRUE, TRUE, FALSE)
+
+df = data.frame(Name, Age, Weight, Height, Hair, Independent)
+```
+:::
+
+::: {.cell .markdown}
+### Normalización y estandarización (stannorm.R)
+:::
+
+::: {.cell .markdown}
+En esta sección se analizan las funciones de normalización y
+estandarización que ofrece el paquete **gestdata**. La implementación de
+dichas funciones se encuentra en el fichero \"stannorm.R\".
+:::
+
+::: {.cell .markdown}
+#### Normalización
+:::
+
+::: {.cell .markdown}
+La librería **gestdata** ofrece una única función para normalizar los
+datos numéricos de un vector, una matriz o un *data.frame*, de tal modo que el valor mínimo sea 0 y el máximo 1.
+En los casos de la matriz y el dataframe, esto se hace para cada columna. La función
+para esta tarea se llama ***normalize***, y sólo recibe una entrada: los
+estructura de datos a normalizar. Veamos unos ejemplos de ejecución:
+:::
+
+::: {.cell .code}
+```{r normalizacion}
+# Normalizar un vector
+normalized = normalize(a)
+
+# Vector original:
+a
+
+# Vector normalizado:
+normalized
+
+# Normalizar una matriz
+normalized = normalize(m)
+
+# Matriz original:
+m
+
+# Matriz normalizada:
+normalized
+
+# Normalizar un data.frame
+normalized = normalize(df)
+
+# Dataframe original:
+df
+
+# Dataframe normalizado:
+normalized
+
+# Que ocurre si le pasamos un vector no numérico?
+tryCatch({
+  normalize(c("abc"))
+}, error = function(e) {
+  cat("\nError:\n")
+  cat(e$message)
+})
+```
+:::
+
+::: {.cell .markdown}
+#### Estandarización
+:::
+
+::: {.cell .markdown}
+Igual que en el caso anterior, el paquete ofrece una única funcion para
+estandarizar: ***standarize***. El funcionamiento es el mismo, sólo que
+esta vez como resultado obtenemos vectores estandarizados, es decir, de
+media 0 y de varianza 1. A continuación se muestran algunos ejemplos:
+:::
+
+::: {.cell .code}
+```{r estandarizacion}
+# Estandarizar un vector
+standarized = standarize(a)
+
+# Vector original:
+a
+
+# Vector estandarizado:
+standarized
+
+# Estandarizar una matriz
+standarized = standarize(m)
+
+# Matriz original:
+m
+
+# Matriz estandarizada:
+standarized
+
+# Estandarizar un data.frame
+standarized = standarize(df)
+
+# Dataframe original:
+df
+
+# Dataframe estandarizado:
+standarized
+
+# Que ocurre si le pasamos un vector no numérico?
+tryCatch({
+  standarize(c("abc"))
+}, error = function(e) {
+  cat("\nError:\n")
+  cat(e$message)
+})
+```
+:::
+
+
+::: {.cell .markdown}
+### Métricas (metrics.R)
+:::
+
+::: {.cell .markdown}
+En esta sección se muestran las funciones que se encuentran en el
+fichero \"metrics.R\", las cuales sirven para calcular diversas
+métricas y hacer algunas operaciones dependiendo de estas.
+:::
+
+::: {.cell .markdown}
+#### Varianza
+:::
+
+::: {.cell .markdown}
+El paquete **gestdata** ofrece la oportunidad de calcular la varianza de
+los datos númericos de un vector, una matriz o un
+dataframe, gracias a la función ***varianza***. Esta función
+sólo necesita recibir los datos como parámetro para actuar. Veamos
+algunos ejemplos:
+:::
+
+::: {.cell .code}
+```{r varianza}
+# Calculamos la varianza de un vector
+vari = varianza(a)
+
+# Vector original:
+a
+
+# Varianza del vector:
+vari
+
+# Calculamos la varianza de una matriz
+vari = varianza(m)
+
+# Matriz original:
+m
+
+# Varianza de la matriz:
+vari
+
+# Calculamos la varianza de un data.frame
+vari = varianza(df)
+
+# Dataframe original:
+df
+
+# Varianza del dataframe:
+vari
+
+# Que ocurre si le pasamos un vector no numérico?
+tryCatch({
+  varianza(c("abc"))
+}, error = function(e) {
+  cat("\nError:\n")
+  cat(e$message)
+})
+```
+:::
+
+::: {.cell .markdown}
+#### Entropía
+:::
+
+::: {.cell .markdown}
+Además de la varianza, permite calcular otra métrica: la entropía. Esta
+métrica se suele utilizar para variables categóricas, pero el paquete
+**gestdata** también admite tratar variables numéricas como si fueran
+categóricas. El calculo de la entropía se hace mediante el método
+***entropy***, y el funcionamiento es exactamente el mismo que el de la
+varianza. Aunque hay que decir que tiene un párametro boolear adicional: 
+*only.categorical*. Si el valor de este es *FALSE*, la función calculará la entropía
+de los datos numéricos como si fueran categóricos.
+:::
+
+::: {.cell .code}
+```{r entropia}
+# Calculamos la entropía de un vector
+entrpy = entropy(a)
+
+# Vector original:
+a
+
+# Entropía del vector:
+entrpy
+
+# Calculamos la entropía de una matriz
+entrpy = entropy(m)
+
+# Matriz original:
+m
+
+# Entropía de la matriz:
+entrpy
+
+# Calculamos la entropía de un data.frame
+entrpy = entropy(df, only.categorical=FALSE)
+
+# Dataframe original:
+df
+
+# Entropía del dataframe:
+entrpy
+
+# Que ocurre si le pasamos un vector vacío?
+tryCatch({
+  entropy(c())
+}, error = function(e) {
+  cat("\nError:\n")
+  cat(e$message)
+})
+```
+:::
+
+::: {.cell .markdown}
+#### ROC y AUC
+:::
+
+::: {.cell .markdown}
+Aparte de las métricas mencionadas, la librería **gestdata** ofrece
+funciones que sirven para manejar muestras de clasificación.
+Concretamente, implementa la función ***ROC***, el cual calcula y
+visualiza el gráfico ROC que se obtiene al hacer la clasificación con
+distintos límites de decisión. Para esto, necesita 3 parámetros: un
+*data.frame* que contenga los datos, el nombre de la variable atributo
+en el dataframe (el que se utiliza para clasificar), y el nombre de la
+variable objetivo que se quiere predecir. Estos nombres tienen que estar
+presentes en el dataframe como columnas. Además, los atributos tienen
+que ser numéricos, y la variable objetivo binaria. Si esto fuera poco.
+también ofrece una función llamada ***AUC*** que sirve para calcular el
+*Area Under the Curve*, es decir, el área que hay debajo de la curva
+ROC. Por lo tanto, las 2 funciones son complementarias, y el segundo
+necesita del output del primero. Veámoslo con algunos ejemplos:
+:::
+
+::: {.cell .code}
+```{r ROC y AUC}
+# Ejecutamos ROC sobre el dataframe df, utilizando la variable "Age" como predictor e 
+# "Independent" como objetivo. La función nos devuelve las coordenadas de los puntos de ROC
+roc_coords = ROC(df,attribute.variable="Age",predict.variable="Independent")
+
+# Coordenadas de los puntos de ROC:
+roc_coords
+
+# Después, para calcular el área, le pasamos las la lista de coordenadas del ROC a la función AUC. 
+area = AUC(roc_coords)
+
+# Área bajo la curva ROC:
+area
+
+# Que ocurre, por ejemplo, si la variable objetivo especificada no es binaria?
+tryCatch({
+  roc_coords = ROC(df,attribute.variable="Age",predict.variable="Weight")
+}, error = function(e) {
+  cat("\nError:\n")
+  cat(e$message)
+})
+```
+:::
+
+::: {.cell .markdown}
+#### Todo en uno
+:::
+
+::: {.cell .markdown}
+Viendo todas las funciones que hay para calcular métricas, **gestdata**
+ofrece un método que combina todas en una, la denominada ***metricas***.
+Esta función, dado un *data.frame* o matriz de datos, calcula todas las
+métricas dependiendo del tipo de variable: varianza para las columnas
+numéricas, entropía para las categóricas, y tambíen tanto la curva ROC
+como el valor AUC si se especifican una variable predictora y una
+objetivo. A continuación se presentan unos ejemplos de ejecución:
+:::
+
+::: {.cell .code}
+```{r metricas}
+# Calculamos las métricas básicas de la matriz: 
+# Dado que todos los elementos de la matriz son numéricos, sólo se calcularán las varianzas
+metr = metricas(m)
+
+# Matriz original:
+m
+
+# Métricas de la matriz:
+metr
+
+# Calculamos las métricas básicas del dataframe: 
+# Varianza para las variables numéricas del dataframe y entropía para las categóricas
+metr = metricas(df)
+
+# Dataframe original:
+df
+
+# Métricas del dataframe:
+metr
+
+#  Además, si se especifican una variable atributo y una objetivo, visualiza el ROC y calcula el AUC
+metricas(df, attribute.variable="Age", predict.variable="Independent")
+```
+:::
+
+
+
+::: {.cell .markdown}
+#### Filtrado de variables en base a las métricas
+:::
+
+::: {.cell .markdown}
+Si esto fuera poco, la librería contiene una función que sirve para
+filtrar las variables de una matriz o  data.frame en base a los valores de las
+métricas básicas (entropía y varianza). Concretamente, la función se
+llama ***filtrar***, y permite al usuario quitar algunas variables por
+medio de la condición que quiera, ya que recibe la condición como
+parámetro de tipo *string*. Además, gracias a 2 parámetros adicionales, permite ajustar el tipo de métrica
+que se quiere utilizar para filtrar. Todo esto se ve más claro con los
+siguientes ejemplos:
+:::
+
+::: {.cell .code}
+```{r filtrar}
+
+# Métricas de la matriz:
+metricas(m)
+
+# Filtramos la matriz en base a la condición varianza>2 
+filtered = filtrar(m,condition=">2", use.varianza=TRUE, use.entropy=FALSE)
+
+# Matriz filtrada:
+filtered
+
+# Métricas del dataframe:
+metricas(df)
+
+# Filtramos el dataframe en base a la condición entropía<=1 (las columnas numéricas no se ven afectadas)
+filtered = filtrar(df,condition="<=1", use.varianza=FALSE, use.entropy=TRUE)
+
+# Dataframe filtrado:
+filtered
+
+# Filtramos el dataframe en base a la condición métrica>1 (se tienen en cuenta todas las columnas)
+filtered = filtrar(df,condition=">1", use.varianza=TRUE, use.entropy=TRUE)
+
+# Dataframe filtrado:
+filtered
+```
+:::
+
+
+::: {.cell .markdown}
+De hecho, la función ***filtrar*** admite condiciones mucho más complejas. 
+Por ejemplo, se puede utilizar el keyword "*%in%*" para ver si la métrica está 
+dentro de una estructura definida por el usuario. Si eso fuera poco, 
+se puede utilizar el keyword "*elem*" para reemplazar el valor de la métrica, 
+y así, crear condiciones más largas y elaboradas. Las posibilidades son 
+infinitas. Aquí se muestran 2 ejemplos: 
+:::
+
+::: {.cell .code}
+```{r filtrar_complex}
+
+# Métricas del dataframe:
+metricas(df)
+
+# En este caso, utilizamos todas las métricas para filtrar (varianza para las numéricas y
+# entropía para las categóricas). La condición en este caso es un poco mas complicada:
+# que el valor de la métrica se encuentre en un vector definido.
+filtered = filtrar(df,condition="%in% c(198.5,0.9709505944546686)", use.varianza=TRUE, use.entropy=TRUE)
+
+# Dataframe filtrado:
+filtered
+
+# Por último, se pueden crear condiciones aún más complejas utilizando el keyword "elem"
+# en la condición, como sustitución del valor de la métrica. Por ejemplo, podemos
+# pedir que el valor de la métrica sea igual a 422.5, o que esté entre 2 y 3:
+filtered = filtrar(df,condition="==422.5 || (elem<3 && elem>2)", use.varianza=TRUE, use.entropy=TRUE)
+
+# Dataframe filtrado:
+filtered
+```
+:::
+
+::: {.cell .markdown}
+### Correlación e información mutua (correlmutua.R)
+:::
+
+::: {.cell .markdown}
+En esta sección se explican las funciones que se encuentran en el
+fichero \"correlmutua.R\", las cuales sirven para calcular la
+correlación y la información mutua entre las variables de una matriz o dataframe.
+Además, el paquete ofrece la posibilidad de visualizar la matriz de relaciones que
+contiene estos valores.
+:::
+
+::: {.cell .markdown}
+#### Correlación
+:::
+
+::: {.cell .markdown}
+El paquete **gestdata** implementa la funcion ***correlacion***, que se
+puede utilizar para calcular las correlaciones entre todos los pares de
+variables numéricas de una matriz o *data.frame*. Concretamente, calcula los
+coeficientes de correlación de Pearson.
+:::
+
+::: {.cell .code}
+```{r correlacion}
+
+# Matriz original:
+m
+
+# Calculamos la correlación entre todas las variables de la matriz
+corr = correlacion(m)
+
+# Coeficientes de correlación de Pearson entre las variables de la matriz:
+corr
+
+# Dataframe original:
+df
+
+# Calculamos la correlación entre todas las variables numéricas del dataframe
+corr = correlacion(df)
+
+# Coeficientes de correlación de Pearson entre las variables numéricas del dataframe:
+corr
+```
+:::
+
+::: {.cell .markdown}
+#### Información mutua
+:::
+
+::: {.cell .markdown}
+Ya que la correlación solo sirve para variables numéricas, el paquete
+**gestdata** ofrece otra función que mide la relación entre variables
+categóricas: ***mutual.information***. Este calcula la información mutua
+entre todas las variables de una matriz o "data.frame". El funcionamiento 
+es el mismo que el de la correlación. Además, tiene un parámetro para definir
+si sólo se quiere calcular sobre las variables categóricas.
+:::
+
+::: {.cell .code}
+```{r mutual information}
+
+# Matriz original:
+m
+
+# Calculamos la información mutua entre todas las variables de la matriz
+mutinfo = mutual.information(m,only.categorical = FALSE)
+
+# Información mutua entre las variables de la matriz:
+mutinfo
+
+# Dataframe original:
+df
+
+# Calculamos la información mutua entre las variables categóricas del dataframe
+mutinfo = mutual.information(df,only.categorical = TRUE)
+
+# Información mutua entre las variables categóricas del dataframe:
+mutinfo
+```
+:::
+
+::: {.cell .markdown}
+#### Todo en uno
+:::
+
+::: {.cell .markdown}
+Debido a que las funciones del fichero \"correlmutua.R\" calculan la
+relación entre las variables de un dataframe, se puede construir una
+matriz de relaciones con todos los valores. De hecho, el método
+***mutual.correlation*** hace justamente eso. Calcula la correlacion
+para todos los pares de variables numéricas, la información mutua para
+las categóricas, y ajusta todos los valores en una matriz cuadrada.
+Los valores de la diagonal serán 1 en el caso de las númericas, y su 
+entropía en el de las categóricas. Los demás serán *NaN*. Veamos unos ejemplos:
+:::
+
+::: {.cell .code}
+```{r mutual correlation}
+
+# Matriz original:
+m
+
+# Calculamos la matriz de relaciones entre las variables de la matriz
+mutcorr = mutual.correlation(m)
+
+# Matriz de correlacion/información mutua:
+mutcorr
+
+# Dataframe original:
+df
+
+# Calculamos la matriz de relaciones entre las variables del dataframe
+mutcorr = mutual.correlation(df)
+
+# Matriz de correlacion/información mutua:
+mutcorr
+```
+:::
+
+::: {.cell .markdown}
+Además, el paquete **gestdata** trae otra función llamada
+***corr.plot***, el cual sirve para hacer un gráfico de tipo heatmap de
+un dataframe. Está pensado para ser utilizado sobre la matriz de
+relaciones, pero se puede utilizar en cualquier otra situación. Veamos
+el resultado que obtiene sobre la última matriz de relaciones calculada
+anteriormente:
+:::
+
+::: {.cell .code}
+```{r heatmap}
+
+# Visualizar la matriz de relaciones por medio de un heatmap
+corr.plot(mutcorr)
+```
+:::
+
+::: {.cell .markdown}
+### Discretización (discretization.R)
+:::
+
+::: {.cell .markdown}
+En esta sección se muestran los métodos que están implementados en el
+fichero \"discretization.R\". Estas funciones sirven para discretizar
+valores númericos, en base a distintos criterios.
+:::
+
+::: {.cell .markdown}
+#### Discretización genérica
+:::
+
+::: {.cell .markdown}
+La discretización más genérica posible consiste en separar los datos en
+intérvalos definidos por el usuario. Estos intérvalos se definen gracias
+a los puntos de corte. **gestdata** ofrece una función llamada
+***discretize*** para esta tarea. Como parámetros necesita recibir un
+vector numérico y los puntos de corte definidos en una lista. En cuanto
+al output, devolverá un vector de tipo factor que contenga los datos
+discretizados en intérvalos, y la definición de los intérvalos que se
+han utilizado como *levels*. A continuación se muestran unas
+ejecuciones:
+:::
+
+::: {.cell .code}
+```{r discretize}
+# Discretizar un vector numérico en 3 intérvalos definidos por los puntos de corte c(1,5)
+discretized = discretize(a,c(1,5))
+
+# Vector original:
+a
+
+# Vector discretizado:
+discretized
+
+# Que ocurre si le pasamos un data.frame?
+tryCatch({
+  discretize(df,c(1,5))
+}, error = function(e) {
+  cat("\nError:\n")
+  cat(e$message)
+})
+```
+:::
+
+
+::: {.cell .markdown}
+#### Discretización de igual anchura (Equal-width binning)
+:::
+
+::: {.cell .markdown}
+Un criterio para discretizar los datos puede ser la anchura de los
+intérvalos. En concreto, **gestdata** ofrece una función denominada
+***discretizeEW*** que discretiza los valores numéricos en *num.bins*
+intérvalos de misma anchura (lo que se conoce como equal-width binning).
+Puede utilizarse con un vector, una matriz o un dataframe. Cuando la entrada 
+es un vector, devuelve un vector de tipo factor. En el caso de las tablas,
+devuelve un objeto del mismo tipo que la entrada sólo que con las columnas 
+númericas discretizadas, cada uno por su cuenta. Además, si se quiere saber
+que puntos de corte se han utilizado en el caso de un vector, se puede utilizar
+la función ***discretizeEW_vector***. Este tiene un parámetro adicional
+llamado *return.cut.points*, que si se pone a *TRUE*, devuelve los puntos de corte
+como segundo elemento de una lista. Todo esto se verá más claro con unos ejemplos:
+:::
+
+::: {.cell .code}
+```{r discretizeEW}
+# Discretizar un vector numérico en 3 intérvalos de igual anchura
+discretized = discretizeEW_vector(a,num.bins=3,return.cut.points = TRUE)
+
+# Vector original:
+a
+
+# Vector discretizado y puntos de cortes calculados:
+discretized
+
+# Discretizar una matriz numérica en 2 intérvalos de igual anchura
+discretized = discretizeEW(m,num.bins=2)
+
+# Matriz original:
+m
+
+# Matriz discretizada:
+discretized
+
+# Discretizar un pd.DataFrame numérico en 4 intérvalos de igual anchura
+discretized = discretizeEW(df,num.bins=4)
+
+# Dataframe original:
+df
+
+# Dataframe discretizado:
+discretized
+
+
+# Que ocurre si le pasamos un vector no numérico?
+tryCatch({
+  discretizeEW(c("abc"),3)
+}, error = function(e) {
+  cat("\nError:\n")
+  cat(e$message)
+})
+```
+:::
+
+
+::: {.cell .markdown}
+#### Discretización de igual frecuencia (Equal-frequency binning)
+:::
+
+::: {.cell .markdown}
+Otro criterio para discretizar los datos puede ser la frecuencia de los
+datos en cada intérvalo. Un algoritmo popular es la discretización de
+igual frecuencia (equal-frequency binning), que discretiza los valores
+tal que en cada intérvalo haya la misma cantidad de datos (puede haber
+una variación de 1). Esta función está implementada en **gestdata**, con
+el nombre de ***discretizeEF***. La manera de utilizarla es idéntica a
+la anterior.
+:::
+
+::: {.cell .code}
+```{r discretizeEF}
+# Discretizar un vector numérico en 3 intérvalos con la misma frecuencia de datos
+discretized = discretizeEF_vector(a,num.bins=3,return.cut.points = TRUE)
+
+# Vector original:
+a
+
+# Vector discretizado y puntos de cortes calculados:
+discretized
+
+# Discretizar una matriz numérica en 2 intérvalos con la misma frecuencia de datos
+discretized = discretizeEF(m,num.bins=2)
+
+# Matriz original:
+m
+
+# Matriz discretizada:
+discretized
+
+# Discretizar un pd.DataFrame numérico en 4 intérvalos con la misma frecuencia de datos
+discretized = discretizeEF(df,num.bins=4)
+
+# Dataframe original:
+df
+
+# Dataframe discretizado:
+discretized
+
+
+# Que ocurre si le pasamos un vector no numérico?
+tryCatch({
+  discretizeEF(c("abc"),3)
+}, error = function(e) {
+  cat("\nError:\n")
+  cat(e$message)
+})
+```
+:::
+
+::: {.cell .markdown}
+#### Discretización por entropía (Entropy-based binning)
+:::
+
+::: {.cell .markdown}
+Si eso fuera poco, **gestdata** implementa otro tipo de discretización:
+la discretización en base a la entropía. Este suele utilizarse para los
+datasets en el ámbito de Machine Learning. Su objetivo es discretizar
+los datos de modo que la información mutua con respecto a la variable
+que se quiere predecir se maximice. Esto, al fin y al cabo, conlleva una
+reducción de entropía de los datos, y puede ayudar en la tarea de la
+predicción.
+
+Este algoritmo es más especial, ya que intenta buscar una separación
+óptima de los atributos, pero el hallazgo no está asegurado. Por tanto,
+puede tener un punto de aleatoriedad, y necesita unos parámetros
+adicionales como el número de intentos/iteraciones. Dicho algoritmo está
+implementado en la función ***entropy.binning***. Para funcionar,
+requiere un vector númerico a discretizar (atributos) y otro vector
+binario que contenga las etiquetas que se quieren predecir. Además, hay
+que especificar el número de intérvalos. Como resultado, devuelve un
+vector de 3 elementos. El primer elemento corresponde al vector
+discretizado, el segundo a los puntos de corte calculados, y el tercero
+será la información mutua máxima que se ha conseguido obtener. Si se
+quieren ver los detalles de la implementación, se puede acudir a su
+documentación. Abajo se muestran unos ejemplos de uso de la función:
+:::
+
+::: {.cell .code}
+```{r entropy binning1}
+# Definimos los atributos y la variable objetivo. En este caso, se quiere predecir 
+# si una persona es independiente en base a su edad.
+atributos = Age
+etiquetas = Independent
+
+# Atributos:
+atributos
+
+# Etiquetas:
+etiquetas
+```
+:::
+
+::: {.cell .code}
+```{r entropy binning2}
+# Discretizamos los atributos en 3 intérvalos. 100 intentos sin aleatoriedad
+output = entropy.binning(atributos,etiquetas,num.bins=3,tries=100,random.cut =FALSE)
+
+# Atributos discretizados:
+output[[1]]
+
+# Puntos de corte calculados:
+output[[2]]
+
+# Información mutua máxima obtenida:
+output[[3]]
+
+# Discretizamos los atributos en 3 intérvalos. 1000 intentos sin aleatoriedad
+output = entropy.binning(atributos,etiquetas,num.bins=3,tries=1000,random.cut =FALSE)
+
+# Atributos discretizados:
+output[[1]]
+
+# Puntos de corte calculados:
+output[[2]]
+
+# Información mutua máxima obtenida:
+output[[3]]
+
+# Discretizamos los atributos en 3 intérvalos. 100 intentos sin aleatoriedad y con un offset de 1
+output = entropy.binning(atributos,etiquetas,num.bins=3,tries=100,random.cut =FALSE, offset = 1)
+
+# Atributos discretizados:
+output[[1]]
+
+# Puntos de corte calculados:
+output[[2]]
+
+# Información mutua máxima obtenida:
+output[[3]]
+
+# Discretizamos los atributos en 3 intérvalos. 5 intentos con aleatoriedad
+output = entropy.binning(atributos,etiquetas,num.bins=3,tries=5,random.cut =TRUE)
+
+# Atributos discretizados:
+output[[1]]
+
+# Puntos de corte calculados:
+output[[2]]
+
+# Información mutua máxima obtenida:
+output[[3]]
+
+# Discretizamos los atributos en 3 intérvalos. 100 intentos con aleatoriedad
+output = entropy.binning(atributos,etiquetas,num.bins=3,tries=100,random.cut =TRUE)
+
+# Atributos discretizados:
+output[[1]]
+
+# Puntos de corte calculados:
+output[[2]]
+
+# Información mutua máxima obtenida:
+output[[3]]
+
+# Discretizamos los atributos en 4 intérvalos. 100 intentos con aleatoriedad
+output = entropy.binning(atributos,etiquetas,num.bins=4,tries=100,random.cut =TRUE)
+
+# Atributos discretizados:
+output[[1]]
+
+# Puntos de corte calculados:
+output[[2]]
+
+# Información mutua máxima obtenida:
+output[[3]]
+```
+:::
+
+::: {.cell .markdown}
+### Visualización de datos (graphics.R)
+:::
+
+::: {.cell .markdown}
+El paquete también ofrece métodos que sirven para visualizar los datos
+de un dataset, teniendo en cuenta si las variables son numéricas o
+categóricas. Dichos métodos se encuentran en el fichero \"graphics.R\".
+Concretamente, hay 2 funciones implementadas: ***boxplot_dataset*** y
+***pieplot***.
+:::
+
+::: {.cell .markdown}
+#### boxplot_dataset
+:::
+
+::: {.cell .markdown}
+El objetivo de esta función es visualizar los datos numéricos de un
+data.frame en un gráfico de tipo boxplot. Por lo tanto, las
+variables categóricas no se ven representadas. Además, tiene un
+parámetro boolear adicional llamado *together*, el cual sirve para
+definir si se quieren visualizar todas las variables en un mismo gráfico
+o no. Esto puede ser útil si los valores de las columnas tienen escalas
+diferentes, ya que los datos no se verían muy claros en un mismo
+diagrama. Veamos unas ejecuciones:
+:::
+
+::: {.cell .code}
+```{r boxplot1}
+# Visualiza los datos numéricos del dataset df en un único boxplot
+boxplot_dataset(df,together=TRUE)
+```
+:::
+
+::: {.cell .code}
+```{r boxplot2}
+# Visualiza los datos numéricos del dataset df en distintos boxplot 
+# (hay que darle al <Enter> para que salga otro)
+boxplot_dataset(df,together=FALSE)
+```
+:::
+
+::: {.cell .markdown}
+#### pieplot
+:::
+
+::: {.cell .markdown}
+El funcionamiento de la función ***pieplot*** es muy parecido al
+anterior. En este caso, dibuja un gráfico de tipo \"pie\" o \"tarta\".
+Es muy conveniente para visualizar las variables categóricas, ya que se
+permite ver la frecuencia de cada valor posible. Este método no admite
+ver los datos en un mismo gráfico. En vez de eso, cada variable se
+visualiza por separado. Además, como es de costumbre, ofrece la
+oportunidad de considerar las variables numéricas como si fueran
+categóricas gracias al parámetro *only.categorical*.
+:::
+
+::: {.cell .code}
+```{r pieplot1}
+# Visualiza sólo los datos categóricos del dataset df 
+# (hay que presionar <Enter> para cada uno)
+pieplot(df,only.categorical=TRUE)
+```
+:::
+
+::: {.cell .code}
+```{r pieplot2}
+# Visualiza todas las variables del dataset df en pieplots
+# (hay que presionar <Enter> para cada uno)
+pieplot(df,only.categorical=FALSE)
+```
+:::
+
+
+::: {.cell .markdown}
+### Lectura y escritura de datasets (readwritedf.py)
+:::
+
+::: {.cell .markdown}
+Además de las funciones ya comentadas, la librería **gestdata**
+proporciona métodos que sirven tanto para guardar dataframes en ficheros
+de distinto formato, como para leer y cargar datasets de ellos. De
+hecho, la librería define un formato propio que se puede utilizar para
+manejar los datasets en ficheros. Estas funciones están definidas en el
+fichero \"readwritedf.R\".
+:::
+
+::: {.cell .markdown}
+#### Lectura y escritura en ficheros CSV
+:::
+
+::: {.cell .markdown}
+El formato estándar que utiliza la librería para guardar y leer datos es
+CSV (.csv). Proporciona una función distinta para cada tarea:
+***dataframe2csv*** para la escritura de un dataframe a un fichero
+.csv, y ***csv2dataframe*** para la lectura. A continuación se muestran
+unos ejemplos de ejecución:
+:::
+
+::: {.cell .code}
+```{r readwritecsv1}
+
+# Dataframe original:
+df
+
+
+# Escribimos el dataframe al fichero llamado "prueba.csv"
+dataframe2csv(df,file.path="prueba.csv")
+
+# Veamos en que formato lo ha escrito:
+con <- file(description="prueba.csv", open="r")
+
+while (length(line <- readLines(con, n = 1)) > 0) {
+  cat(substr(line, 1, nchar(line)), "\n")
+}
+
+close(con)
+
+
+# Recuperamos el dataframe leyendo el fichero llamado "prueba.csv"
+csv2dataframe(file.path="prueba.csv")
+
+
+# Borramos el fichero para que no moleste
+file.remove("prueba.csv")
+```
+:::
+
+::: {.cell .code}
+```{r readwritecsv2}
+
+# Algunos ejemplos de mal uso:
+
+# Que ocurre si le pasamos una entrada de otro tipo?
+tryCatch({
+  dataframe2csv(a,file.path="prueba.csv")
+}, error = function(e) {
+  cat("\nError:\n")
+  cat(e$message)
+})
+
+# Que ocurre si le pedimos que lo escriba en un fichero que no sea .csv?
+tryCatch({
+  dataframe2csv(a,file.path="prueba.txt")
+}, error = function(e) {
+  cat("\nError:\n")
+  cat(e$message)
+})
+```
+:::
+
+::: {.cell .markdown}
+#### Lectura y escritura en ficheros en formato propio
+:::
+
+::: {.cell .markdown}
+Además del formato CSV, el paquete **gestdata** trae un formato propio
+para la escritura y lectura de los dataset. Igual que en el caso
+anterior, ofrece 2 funciones para este formato; uno para cada tarea:
+***write.dataframe*** para la escritura de un *pd.DataFrame* a un
+fichero, y ***read.dataframe*** para la lectura. Además, ofrecen la
+opción de darle un nombre al dataset. Esto se hace usando una lista de 2
+elementos como parámetro. A continuación se proveen unos ejemplos. Si se
+quiere saber el formato concreto que utiliza para guardar los dataset,
+está especificado en la documentación de la función ***write.dataframe***.
+:::
+
+::: {.cell .code}
+```{r readwritecustom1}
+
+# Dataframe original:
+df
+
+# Escribimos el dataframe al fichero llamado "prueba.txt"
+write.dataframe(df,file.path="prueba.txt")
+
+# Veamos en que formato lo ha escrito:
+con <- file(description="prueba.txt", open="r")
+
+while (length(line <- readLines(con, n = 1)) > 0) {
+  cat(substr(line, 1, nchar(line)), "\n")
+}
+
+close(con)
+
+
+# Recuperamos el dataframe leyendo el fichero llamado "prueba.txt"
+read.dataframe(file.path="prueba.txt")
+
+# Borramos el fichero para que no moleste
+file.remove("prueba.txt")
+```
+:::
+
+::: {.cell .code}
+```{r readwritecustom2}
+
+# Escribimos el dataframe y el nombre 'ElDataset' al fichero llamado "prueba.txt"
+write.dataframe(list("ElDataset",df),file.path="prueba.txt")
+
+# Veamos en que formato lo ha escrito:
+con <- file(description="prueba.txt", open="r")
+
+while (length(line <- readLines(con, n = 1)) > 0) {
+  cat(substr(line, 1, nchar(line)), "\n")
+}
+
+close(con)
+
+
+# Recuperamos el nombre y el dataframe leyendo el fichero llamado "prueba.txt"
+read.dataframe(file.path="prueba.txt")
+
+# Borramos el fichero para que no moleste
+file.remove("prueba.txt")
+```
+:::
+
+::: {.cell .code}
+```{r readwritecustom3}
+
+# Algunos ejemplos de mal uso:
+
+# Que ocurre si le pasamos una entrada de otro tipo?
+tryCatch({
+  write.dataframe(list("ElDataset",a),file.path="prueba.txt")
+}, error = function(e) {
+  cat("\nError:\n")
+  cat(e$message)
+})
+
+# Que ocurre si le pasamos una entrada de otro tipo?
+tryCatch({
+  write.dataframe("hola",file.path="prueba.txt")
+}, error = function(e) {
+  cat("\nError:\n")
+  cat(e$message)
+})
+
+# Que ocurre si le pasamos la entrada en otro orden?
+tryCatch({
+  write.dataframe(list(df,"ElDataset"),file.path="prueba.txt")
+}, error = function(e) {
+  cat("\nError:\n")
+  cat(e$message)
+})
+
+# Que ocurre si le pasamos un dataframe vacío?
+tryCatch({
+  write.dataframe(data.frame(),file.path="prueba.txt")
+}, error = function(e) {
+  cat("\nError:\n")
+  cat(e$message)
+})
+```
+:::
+
+::: {.cell .markdown}
+### Clase Dataset (dataset.R) {#clase-dataset-datasetpy}
+:::
+
+::: {.cell .markdown}
+El paquete **gestdata** no ofrece únicamente funciones, si no que
+también implementa una clase personalizada para el manejo de un dataset.
+Esta clase se llama ***Dataset***, y se encuentra en el fichero
+*dataset.R*. En cuanto a la estructuración y el acceso a los datos, es
+parecido a un *data.frame* de R. Esta clase implementa varias funciones que
+sirven para añadir, quitar e indexar datos. A continuación se muestra el
+funcionamiento de esta clase:
+:::
+
+::: {.cell .code}
+```{r dataset1}
+# Creamos un objeto de tipo Dataset
+dataset = new("Dataset")
+
+# Al principio está vacío, sin ningún dato
+dataset
+```
+:::
+
+
+::: {.cell .markdown}
+Añadimos una fila de datos con la función ***add_row***. El parámetro
+tiene que ser una lista de valores.
+:::
+
+::: {.cell .code}
+```{r dataset2}
+
+dataset = add_row(dataset,list("Jon",23,61))
+dataset
+```
+:::
+
+::: {.cell .markdown}
+***add_row*** ha hecho que las dimensiones del *Dataset* sean (1,3), ya
+que hemos añadido una fila de 3 valores. Por tanto, se han creado 3
+columnas, y la clase *Dataset* les ha dado un nombre por defecto: V1,V2
+y V3. Además, nos dice de que tipo son los valores de cada columna.
+Estos tipos hay que respetarlos, ya que la clase *Dataset* tiene la
+restricción de que todos los valores de una columna tienen que tener el
+mismo tipo.
+:::
+
+::: {.cell .markdown}
+En vez de ir añadiendo filas uno por uno, podemos utilizar la función
+***add_rows*** para añadir cualquier número de filas a la vez. Por
+tanto, el parámetro esta vez tendrá que ser una lista de filas (lista de
+listas).
+:::
+
+::: {.cell .code}
+```{r dataset3}
+
+dataset = add_rows(dataset,list(list("Bill",41,98),list("Maria",32,75),list("Ben",58,112)))
+dataset
+```
+:::
+
+
+::: {.cell .markdown}
+Pero si no respetamos el tipo que se le ha establecido a cada columna,
+nos dará un error personalizado:
+:::
+
+::: {.cell .code}
+```{r dataset4}
+
+tryCatch({
+  dataset = add_row(dataset,list(10,"Jose",5))
+}, error = function(e) {
+  cat("\nError:\n")
+  cat(e$message)
+})
+```
+:::
+
+
+::: {.cell .markdown}
+Igual que se pueden agregar filas, ofrece la posibilidad de añadir
+columnas mediante 2 funciones: ***add_col*** y ***add_cols***. Hay que
+tener en cuenta que todos los valores de la columna tienen que tener el
+mismo tipo, y la columna tiene que tener la misma longitud que las que
+ya están en el *Dataset*. Aparte de eso, los métodos aceptan un
+parámetro extra para definir los nombres que recibirán las columnas.
+:::
+
+::: {.cell .code}
+```{r dataset5}
+
+dataset = add_col(dataset,c(1.75,1.68,1.56,1.86),name="Height")
+dataset
+```
+:::
+
+::: {.cell .code}
+```{r dataset6}
+
+dataset = add_cols(dataset,list(c("Long","Short","Long","Short"),c(TRUE,FALSE,TRUE,TRUE)),names=c("Hair","Independent"))
+dataset
+```
+:::
+
+::: {.cell .markdown}
+Veamos algunos ejemplos de errores personalizados:
+:::
+
+::: {.cell .code}
+```{r dataset7}
+
+tryCatch({
+    dataset = add_col(dataset,list(10,"Jose",25,24))
+}, error = function(e) {
+    cat("\nError:\n")
+    cat(e$message)
+})
+
+tryCatch({
+    dataset = add_col(dataset,c(10,1,3))
+}, error = function(e) {
+    cat("\nError:\n")
+    cat(e$message)
+})
+
+tryCatch({
+    dataset = add_col(dataset,"hola")
+}, error = function(e) {
+    cat("\nError:\n")
+    cat(e$message)
+})
+
+tryCatch({
+    dataset = add_col(dataset,list(new("Dataset"),new("Dataset"),new("Dataset"),new("Dataset")))
+}, error = function(e) {
+    cat("\nError:\n")
+    cat(e$message)
+})
+```
+:::
+
+
+::: {.cell .markdown}
+El último error es más especial, ya que, como indica, la clase *Dataset*
+solo admite 4 tipos de valores entre sus datos: *integer*, *float*,
+*boolean* y *string*. Si se intenta agregar un valor de un tipo que no
+se encuentre en esa lista, no será admitido.
+:::
+
+::: {.cell .markdown}
+Hasta ahora sólo hemos estado añadiendo filas y columnas. Por tanto, es
+necesario que haya funciones para quitar datos del *Dataset*. Esto se
+hace mediante las funciones ***remove_row***, ***remove_rows***,
+***remove_col*** y ***remove_cols***. Los nombres son suficientemente
+explicativos. En esta ocasión, las funciones necesitan recibir índices
+(*integer*) para saber que fila(s) o columna(s) hay que quitar. En el
+caso de las columnas, también se admiten índices de tipo *string* que
+correspondan con los nombres de las variables. Abajo se muestran unos
+ejemplos de uso:
+:::
+
+::: {.cell .code}
+```{r dataset8}
+
+# Función de ayuda para hacer una copia de un objeto
+copy = function(x){
+    return(x)
+}
+
+# Copiamos el dataset que hemos construido para no perder los datos
+dataset2 = copy(dataset)
+dataset2
+```
+:::
+
+::: {.cell .code}
+```{r dataset9}
+
+# Quitamos la primera fila
+dataset2 = remove_row(dataset2,1)
+dataset2
+```
+:::
+
+::: {.cell .code}
+```{r dataset10}
+
+# Quitamos las 2 últimas filas
+dataset2 = remove_rows(dataset2,c(2,3))
+dataset2
+```
+:::
+
+::: {.cell .code}
+```{r dataset11}
+
+# Quitamos la segunda columna utilizando el índice
+dataset2 = remove_col(dataset2,2)
+dataset2
+```
+:::
+
+::: {.cell .code}
+```{r dataset12}
+
+# Quitamos varias columnas utilizando los nombres e índices
+dataset2 = remove_cols(dataset2,list("V1",2,"Independent"))
+dataset2
+```
+:::
+
+::: {.cell .markdown}
+Además, la clase tiene implementada la función ***get_length***, lo que
+permite saber de que tamaño es un *Dataset*. El tamaño se considera el número
+de columnas. 
+:::
+
+::: {.cell .code}
+```{r dataset13}
+
+# Tamaño del dataset original
+get_length(dataset)
+
+# Tamaño del dataset2
+get_length(dataset2)
+```
+:::
+
+::: {.cell .markdown}
+Si eso fuera poco, podemos nombrar las columnas del dataset a nuestro
+antojo. Esto se puede hacer gracias a la función ***rename_cols***. Este
+recibe un vector de carácteres con los nuevos nombres de todas las columnas.
+:::
+
+::: {.cell .code}
+```{r dataset14}
+
+# Dataset original
+dataset
+
+# Cambiamos los nombres de las columnas:
+dataset = rename_cols(dataset,c("Name","Age","Weight","Height","Hair","Independent"))
+
+# Dataset con los nombres cambiados
+dataset
+```
+:::
+
+
+::: {.cell .markdown}
+Para ir acabando, se quiere mostrar la indexación de un objeto de tipo
+*Dataset*. Los objetos de tipo *Dataset* se pueden indexar mediante
+la función ***getitem***. Este método admite hasta 2 índices: el primero 
+sirve para indexar las columnas y el segundo para las filas (opcional). De 
+hecho, el primer índice puede ser un *string* o un *integer*.
+:::
+
+::: {.cell .code}
+```{r dataset15}
+
+# Dataset original
+dataset
+
+# 1: Indexamos la segunda columna (Age) mediante un índice numérico
+getitem(dataset,2)
+
+# 2: Indexamos la segunda columna (Age) mediante el nombre
+getitem(dataset,"Age")
+
+# 3: Indexamos el último elemento de la primera columna:
+getitem(dataset,1,dataset@shape[1])
+```
+:::
+
+::: {.cell .markdown}
+Para terminar, la clase ofrece 2 funciones para la conversión de entre
+las tablas de R. La primera función trata de un método constructor de la 
+clase *Dataset*, y se llama ***dataset_from_table***. Se puede utilizar para
+crear un objeto de tipo *Dataset* directamente con los datos de una matriz o 
+data.frame de R.  El
+segundo método es ***to_dataframe***, el cual devuelve un *data.frame*
+con los mismos datos de un objeto *Dataset*. El empleo de estas
+funciones no tiene mucho misterio:
+:::
+
+::: {.cell .code}
+```{r dataset16}
+
+# Convertimos el Dataset en un data.frame
+dataframe = to_dataframe(dataset)
+dataframe
+
+# Reconvertimos el data.frame en un Dataset
+dataset = dataset_from_table(dataframe)
+dataset
+
+
+# Probamos a cargar un Dataset de una matriz
+dataset2 = dataset_from_table(matrix(c(1,2,3,4,5,6,7,8,9,10,11,12), nrow = 3, ncol = 4, byrow = FALSE))
+dataset2
+
+
+```
+:::
+
+::: {.cell .markdown}
+### Funciones extra
+:::
+
+::: {.cell .markdown}
+En esta última sección se presentan unas funciones adicionales que se
+implementan en el paquete **gestdata** y que pueden ser útiles para la
+gestión de datasets y de datos de Machine Learning. Concretamente, se
+encuentran en el fichero \"extras.R\".
+:::
+
+::: {.cell .markdown}
+:::
+
+::: {.cell .markdown}
+La función ***is.binary*** sirve para saber si un vector contiene datos
+binarios o no. Los valores binarios se consideran {0,1,FALSE,TRUE}. Por
+tanto, el output del método será *TRUE* si todos los valores del vector
+están en ese grupo, y *FALSE* en el caso contrario. Puede ser útil para
+saber si una variable tiene los datos correctos como para ser una
+variable objetivo de etiquetas. El funcionamiento es muy simple de
+entender:
+:::
+
+::: {.cell .code}
+```{r dataset17}
+# Vemos cual es el output de la función con distintos vectores:
+
+v = c(1,2,3,4,5,6,7,8)
+cat("Es binario el vector? ", is.binary(v))
+
+v = c("a","b","c","d","e","f","g","h")
+cat("Es binario el vector? ", is.binary(v))
+
+
+v = c("FALSE","TRUE","TRUE")
+cat("Es binario el vector? ", is.binary(v))
+
+
+v = c(FALSE, TRUE, TRUE)
+cat("Es binario el vector? ", is.binary(v))
+
+v = c(1,0,1,0,0,0,1,0,1,0)
+cat("Es binario el vector? ", is.binary(v))
+
+```
+:::
+
+
+::: {.cell .markdown}
+#### conditional.entropy
+:::
+
+::: {.cell .markdown}
+El método ***conditional.entropy***, tal como indica su nombre, sirve
+para calcular la entropía condicional entre 2 vectores. De hecho, sólo
+necesita 2 parámetros para funcionar: el primer vector (condicionado) y
+el segundo (condicionante). Como output, devuelve un valor numérico que
+corresponde a la entropía condicional de entre los vectores de entrada.
+Sirve tanto para variables numéricas como para categóricas. Abajo se
+muestran unos ejemplos:
+:::
+
+::: {.cell .code}
+```{r dataset18}
+
+# PRUEBA 1:
+condicionado = Age
+condicionante = Independent
+cond_entrpy = conditional.entropy(condicionado, condicionante)
+
+# Vector condicionado:
+condicionado
+
+# Vector condicionante:
+condicionante
+
+# Valor de la entropía condicional:
+cond_entrpy
+
+# PRUEBA 2:
+condicionado = Independent
+condicionante = Age
+cond_entrpy = conditional.entropy(condicionado, condicionante)
+
+# Vector condicionado:
+condicionado
+
+# Vector condicionante:
+condicionante
+
+# Valor de la entropía condicional:
+cond_entrpy
+
+# PRUEBA 3:
+condicionado = Independent
+condicionante = Hair
+cond_entrpy = conditional.entropy(condicionado, condicionante)
+
+# Vector condicionado:
+condicionado
+
+# Vector condicionante:
+condicionante
+
+# Valor de la entropía condicional:
+cond_entrpy
+
+# PRUEBA 4:
+condicionado = Name
+condicionante = Height
+cond_entrpy = conditional.entropy(condicionado, condicionante)
+
+# Vector condicionado:
+condicionado
+
+# Vector condicionante:
+condicionante
+
+# Valor de la entropía condicional:
+cond_entrpy
+
+```
+:::
+
+
+::: {.cell .markdown}
+#### numeric.columns
+:::
+
+::: {.cell .markdown}
+La función ***numeric.columns*** se puede utilizar para conseguir una 
+máscara de valores booleanos que permita acceder a las columnas númericas
+de una tabla. Como párametro recibe únicamente una matriz o un *data.frame*,
+y devuelve un vector *logical* con valores *TRUE* en las posiciones que
+corresponden a las columnas númericas de la tabla de entrada, y *FALSE*
+en las demás. Por tanto, la máscara es útil para indexar una tabla y conseguir
+las variables numéricas. En el caso de la matriz no cobra mucho sentido,
+ya que en R todos los valores tienen que ser del mismo tipo. Pero,
+aún así, es bueno saber que este método es apto para matrices.
+A continuación se muestran unos ejemplos:
+:::
+
+::: {.cell .code}
+```{r dataset19}
+
+# Dataframe original:
+df
+
+# Máscara de columnas numéricas:
+mask = numeric.columns(df)
+mask
+
+# Indexamos las columnas numéricas:
+df[,mask]
+
+# Matriz original:
+m
+
+# Máscara de columnas numéricas:
+mask = numeric.columns(m)
+mask
+
+# Indexamos las columnas numéricas:
+m[,mask]
+
+```
+
+:::

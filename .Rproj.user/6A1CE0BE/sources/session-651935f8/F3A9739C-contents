@@ -1,0 +1,29 @@
+Package: gestdata
+Type: Package
+Title: Paquete para manejar datasets
+Version: 0.1.0
+Author: Aimar Zabala Vergara
+Maintainer: Aimar Zabala Vergara <aimar.zabala@ehu.eus>
+Description: Este paquete incluye una clase propia y varias funciones para manejar datasets
+  y hacer análisis sobre ellos.
+Collate:
+  correlmutua.R
+  dataset.R
+  discretization.R
+  extras.R
+  graphics.R
+  metrics.R
+  readwritedf.R
+  stannorm.R
+Suggests: 
+  ggcorrplot,
+  knitr,
+  rmarkdown
+License:  GPL (>= 2)
+Encoding: UTF-8
+BuildVignettes: TRUE
+VignetteBuilder:
+  knitr,
+  rmarkdown
+LazyData: true
+RoxygenNote: 7.2.3
